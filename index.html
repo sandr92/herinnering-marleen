@@ -187,6 +187,37 @@
         btn.textContent = '▶ Luister';
       }
     });
+    <script>
+  const audio = document.getElementById('voice');
+  const btn = document.getElementById('playBtn');
+
+  btn.addEventListener('click', () => {
+    if (audio.paused) {
+      audio.play();
+      btn.textContent = '⏸ Pauzeer';
+      audio.style.display = 'block';
+    } else {
+      audio.pause();
+      btn.textContent = '▶ Luister';
+    }
+  });
+
+  // ✅ als het nummer klaar is: knop terugzetten
+  audio.addEventListener('ended', () => {
+    btn.textContent = '▶ Opnieuw luisteren';
+    audio.currentTime = 0;
+  });
+
+  // (optioneel) als iemand pauzeert via de audio-controls
+  audio.addEventListener('pause', () => {
+    if (!audio.ended) btn.textContent = '▶ Verder luisteren';
+  });
+
+  audio.addEventListener('play', () => {
+    btn.textContent = '⏸ Pauzeer';
+  });
+</script>
+
   </script>
 
 </body>
