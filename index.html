@@ -205,9 +205,9 @@
       }
     });
 
-    audio.addEventListener('play', () => {
-      btn.textContent = '⏸ Pauzeer';
-      statusEl.textContent = 'Aan het afspelen';
+    audio.addEventListener('Klaar om te luisteren', () => {
+      btn.textContent = '⏸ Even Pauze';
+      statusEl.textContent = 'Je luistert';
     });
 
     audio.addEventListener('pause', () => {
