@@ -30,8 +30,8 @@
         url("background.jpg") center / cover no-repeat fixed;
     }
 
-    /* ✅ JUIST GEPLAATST */
-    .bg-blur {
+    /* Achtergrond onscherp */
+    .bg-blur{
       position: fixed;
       inset: 0;
       backdrop-filter: blur(10px);
@@ -69,6 +69,7 @@
       overflow:hidden;
       border: 1px solid rgba(255,255,255,.25);
       background: rgba(255,255,255,.08);
+      flex-shrink: 0;
     }
 
     .photo img{
@@ -88,6 +89,7 @@
       margin-top:6px;
       color: var(--muted);
       font-size: 14px;
+      line-height: 1.35;
     }
 
     .content{
@@ -105,6 +107,7 @@
       background: rgba(255,255,255,.92);
       color: #0b1220;
       display:flex;
+      align-items:center;
       justify-content:center;
       gap: 10px;
     }
@@ -134,7 +137,7 @@
 
 <body>
 
-  <!-- ✅ APARTE BLUR LAAG -->
+  <!-- Blur laag -->
   <div class="bg-blur"></div>
 
   <div class="wrap">
@@ -146,7 +149,7 @@
         </div>
         <div>
           <h1>Haar stem, altijd dichtbij</h1>
-          <p class="sub">Luister wanneer je haar even dichtbij wil voelen</p>
+          <p class="sub">Luister wanneer je haar even dichtbij wil voelen.</p>
         </div>
       </div>
 
@@ -155,7 +158,6 @@
           ▶ Luister
         </button>
 
-        <!-- ✅ WAV correct gedeclareerd -->
         <audio id="voice">
           <source src="Marleen.wav" type="audio/wav">
         </audio>
@@ -176,48 +178,53 @@
   <script>
     const audio = document.getElementById('voice');
     const btn = document.getElementById('playBtn');
+    const statusEl = document.getElementById('status');
+    const timeEl = document.getElementById('time');
 
-    btn.addEventListener('click', () => {
-      if (audio.paused) {
-        audio.play();
-        btn.textContent = '⏸ Pauzeer';
-        audio.style.display = 'block';
-      } else {
-        audio.pause();
-        btn.textContent = '▶ Luister';
+    function formatTime(sec){
+      sec = Math.max(0, sec || 0);
+      const m = String(Math.floor(sec / 60)).padStart(2,'0');
+      const s = String(Math.floor(sec % 60)).padStart(2,'0');
+      return `${m}:${s}`;
+    }
+
+    btn.addEventListener('click', async () => {
+      try{
+        if (audio.paused){
+          await audio.play();
+          btn.textContent = '⏸ Pauzeer';
+          statusEl.textContent = 'Aan het afspelen';
+          audio.style.display = 'block';
+        } else {
+          audio.pause();
+        }
+      } catch(e){
+        btn.textContent = '▶ Tik nog eens';
       }
     });
-    <script>
-  const audio = document.getElementById('voice');
-  const btn = document.getElementById('playBtn');
 
-  btn.addEventListener('click', () => {
-    if (audio.paused) {
-      audio.play();
+    audio.addEventListener('play', () => {
       btn.textContent = '⏸ Pauzeer';
-      audio.style.display = 'block';
-    } else {
-      audio.pause();
-      btn.textContent = '▶ Luister';
-    }
-  });
+      statusEl.textContent = 'Aan het afspelen';
+    });
 
-  // ✅ als het nummer klaar is: knop terugzetten
-  audio.addEventListener('ended', () => {
-    btn.textContent = '▶ Opnieuw luisteren';
-    audio.currentTime = 0;
-  });
+    audio.addEventListener('pause', () => {
+      if (!audio.ended) {
+        btn.textContent = '▶ Verder luisteren';
+        statusEl.textContent = 'Gepauzeerd';
+      }
+    });
 
-  // (optioneel) als iemand pauzeert via de audio-controls
-  audio.addEventListener('pause', () => {
-    if (!audio.ended) btn.textContent = '▶ Verder luisteren';
-  });
+    audio.addEventListener('ended', () => {
+      btn.textContent = '▶ Opnieuw luisteren';
+      statusEl.textContent = 'Klaar';
+      audio.currentTime = 0;
+      timeEl.textContent = '00:00';
+    });
 
-  audio.addEventListener('play', () => {
-    btn.textContent = '⏸ Pauzeer';
-  });
-</script>
-
+    audio.addEventListener('timeupdate', () => {
+      timeEl.textContent = formatTime(audio.currentTime);
+    });
   </script>
 
 </body>
